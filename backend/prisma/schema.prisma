@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator erd {
+  provider = "prisma-erd-generator-markdown"
+  output   = "./ERD.md"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum StaffRole {
+  ADMIN
+  STAFF
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+}
+
+enum AccountType {
+  SAVINGS
+  BUSINESS
+  LOAN
+}
+
+enum AccountStatus {
+  OPEN
+  CLOSED
+}
+
+model Address {
+  id           String    @id @default(uuid())
+  pincode      String
+  city         String
+  country      String
+  addressLine1 String    @map("address_line_1")
+  addressLine2 String?   @map("address_line_2")
+  accounts     Account[]
+
+  @@map("addresses")
+}
+
+model Account {
+  id                      String        @id @default(uuid())
+  accountNo               String        @unique @map("account_no")
+  accountHolderFirstName  String
+  accountHolderMiddleName String?
+  accountHolderLastName   String
+  accountHolderEmail      String
+  accountHolderAddressId  String
+  accountHolderAddress    Address       @relation(fields: [accountHolderAddressId], references: [id], onDelete: Cascade)
+  type                    AccountType   @default(SAVINGS)
+  accountStatus           AccountStatus @default(OPEN) @map("account_status")
+  balance                 Decimal       @default(0.00) @db.Decimal(12, 2)
+
+  branchId String @map("branch_id")
+  branch   Branch @relation(fields: [branchId], references: [id])
+
+  loanDetails     LoanDetails?
+  businessDetails BusinessDetails?
+
+  sentTransactions     Transaction[] @relation("SenderAccount")
+  receivedTransactions Transaction[] @relation("ReceiverAccount")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("accounts")
+}
+
+model LoanDetails {
+  id              String  @id @default(uuid())
+  accountId       String  @unique @map("account_id")
+  account         Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  principalAmount Decimal @map("principal_amount") @db.Decimal(12, 2)
+  interestRate    Decimal @map("interest_rate") @db.Decimal(5, 2)
+  termMonths      Int     @map("term_months")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("loan_details")
+}
+
+model BusinessDetails {
+  id        String  @id @default(uuid())
+  accountId String  @unique @map("account_id")
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  taxId       String @map("tax_id")
+  companyName String @map("company_name")
+
+  @@map("business_details")
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  transactionType TransactionType @map("transaction_type")
+  amount          Decimal         @db.Decimal(12, 2)
+
+  senderId      String?  @map("sender_id")
+  senderAccount Account? @relation("SenderAccount", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId      String?  @map("receiver_id")
+  receiverAccount Account? @relation("ReceiverAccount", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("transactions")
+}
+
+model Staff {
+  id             String         @id @default(uuid())
+  firstName      String         @map("first_name")
+  lastName       String         @map("last_name")
+  bankerEmail    String         @unique @map("banker_email")
+  hashedPassword String         @map("hashed_password")
+  role           StaffRole      @default(STAFF)
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  sessions       StaffSession[]
+  branch         Branch         @relation(fields: [branchId], references: [id])
+  branchId       String         @map("branch_id")
+
+  @@map("staff")
+}
+
+model StaffSession {
+  id               String   @id @default(uuid())
+  staffId          String   @map("staff_id")
+  staff            Staff    @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  refreshTokenHash String   @unique @map("refresh_token_hash")
+  userAgent        String   @map("user_agent")
+  ipAddress        String   @map("ip_address")
+  isRevoked        Boolean  @default(false) @map("is_revoked")
+  expiresAt        DateTime @map("expires_at")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("staff_sessions")
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  branchId  String   @unique @map("branch_id")
+  name      String
+  address   String
+  city      String
+  country   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  staff    Staff[]
+  accounts Account[]
+
+  @@map("branches")
+}

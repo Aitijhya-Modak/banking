@@ -1,0 +1,1 @@
+export const BANK_ACCOUNT_MINIMUM_BALANCE = 50.0;
