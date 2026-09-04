@@ -424,6 +424,7 @@ export default function AccountDetailsPage() {
   };
 
   const handlePaySubmit = async (e: SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!accountNo) return;
 
     setIsActionSubmitting(true);
@@ -967,10 +968,6 @@ export default function AccountDetailsPage() {
               )}
             </div>
 
-            {/* =================================================
-                TRANSACTION LIST
-            ================================================= */}
-
             <div className="divide-y divide-brand-border">
               {isTxLoading ? (
                 <div className="py-12 text-center text-xs text-brand-muted">
@@ -990,9 +987,6 @@ export default function AccountDetailsPage() {
 
                   const currentAccountNo = accountNo?.toLowerCase();
 
-                  const senderAccountNo =
-                    tx.senderAccount?.accountNo?.toLowerCase();
-
                   const receiverAccountNo =
                     tx.receiverAccount?.accountNo?.toLowerCase();
 
@@ -1005,8 +999,6 @@ export default function AccountDetailsPage() {
                   /*
                    * Outgoing transfer
                    */
-
-                  const isOutgoing = senderAccountNo === currentAccountNo;
 
                   /*
                    * Deposits are credits.
