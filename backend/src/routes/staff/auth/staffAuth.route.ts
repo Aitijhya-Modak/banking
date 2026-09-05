@@ -44,7 +44,7 @@ staffAuthRouter.post(
       res.cookie("staffAccessToken", accessToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 15 * 60 * 1000,
         path: "/",
       });
@@ -52,7 +52,7 @@ staffAuthRouter.post(
       res.cookie("staffRefreshToken", refreshToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "strict",
+        sameSite: "none",
         maxAge: 8 * 60 * 60 * 1000,
         path: "/api/staff/auth",
       });
@@ -168,14 +168,14 @@ staffAuthRouter.post(
       res.clearCookie("staffAccessToken", {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "strict",
+        sameSite: "none",
         path: "/",
       });
 
       res.clearCookie("staffRefreshToken", {
         httpOnly: true,
         secure: isProduction,
-        sameSite: "strict",
+        sameSite: "none",
         path: "/api/staff/auth",
       });
 
