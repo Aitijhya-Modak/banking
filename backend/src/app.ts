@@ -22,7 +22,7 @@ export function createApp() {
   app.use(notFoundRoute);
   app.use(handleError);
 
-  app.listen(env.PORT, () => {
+  app.listen(env.PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${env.PORT}`);
   });
 }
