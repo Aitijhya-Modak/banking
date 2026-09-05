@@ -97,7 +97,7 @@ staffAuthRouter.post("/refresh", async (req, res, next) => {
     res.cookie("staffAccessToken", accessToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 15 * 60 * 1000,
       path: "/",
     });
@@ -105,7 +105,7 @@ staffAuthRouter.post("/refresh", async (req, res, next) => {
     res.cookie("staffRefreshToken", refreshToken, {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "strict",
+      sameSite: "none",
       maxAge: 8 * 60 * 60 * 1000,
       path: "/api/staff/auth",
     });
