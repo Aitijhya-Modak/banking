@@ -6,7 +6,9 @@ import { useStaffAuthStore } from "../hooks/useStaffAuthStore";
  * Cookies are included with requests to support authentication sessions.
  */
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:10000/api",
+  baseURL:
+    import.meta.env.API_URL ||
+    "https://banking-backend-537108330029.us-central1.run.app/api",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
